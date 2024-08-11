@@ -54,15 +54,10 @@ public class FirstWindow : MonoBehaviour
         GenericUtils.FindChildByName<Text>(gameObject, "version")
             .text = Application.version + " ";
 
-        GetList(Application.persistentDataPath);
-        setting_.SetActive(true);
-
-#if UNITY_EDITOR
-        var main_entry = GameObject.FindObjectOfType<MainEntry>();
-        if(!string.IsNullOrEmpty(main_entry.era_path))
-            GetList(main_entry.era_path);
-#endif
 #if UNITY_ANDROID && !UNITY_EDITOR
+        //安卓11以上检测文件权限
+        uEmuera.Utils.RequestAndroidAllFilesAccess();
+
         GetList("storage/emulated/0/emuera");
         GetList("storage/emulated/1/emuera");
         GetList("storage/emulated/2/emuera");
@@ -71,9 +66,15 @@ public class FirstWindow : MonoBehaviour
         GetList("storage/sdcard1/emuera");
         GetList("storage/sdcard2/emuera");
 #endif
-#if UNITY_STANDALONE && !UNITY_EDITOR
-        GetList(Path.GetFullPath(Application.dataPath + "/.."));
+
+#if UNITY_EDITOR
+        var main_entry = GameObject.FindObjectOfType<MainEntry>();
+        if(!string.IsNullOrEmpty(main_entry.era_path))
+            GetList(main_entry.era_path);
 #endif
+
+        GetList(Application.persistentDataPath);
+        setting_.SetActive(true);
     }
 
     void OnOptionClick()
@@ -128,15 +129,15 @@ public class FirstWindow : MonoBehaviour
         try
         {
             var paths = Directory.GetDirectories(workspace, "*", SearchOption.TopDirectoryOnly);
+            System.Array.Sort(paths);
             foreach(var p in paths)
             {
                 var path = uEmuera.Utils.NormalizePath(p);
                 if(File.Exists(path + "/emuera.config") || Directory.Exists(path + "/ERB"))
-                    AddItem(path.Substring(workspace.Length + 1), workspace);
+                    AddItem(Path.GetFileName(path), workspace);
             }
         }
-        catch(DirectoryNotFoundException e)
-        { }
+        catch { }
     }
 
     public Text titlebar = null;

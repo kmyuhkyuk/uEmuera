@@ -87,9 +87,9 @@ namespace MinorShift.Emuera.Content
 			try
 			{
 				//resourcesフォルダ内の全てのcsvファイルを探索する
-				List<string> csvFiles = new List<string>(Directory.GetFiles(Program.ContentDir, "*.csv", SearchOption.TopDirectoryOnly));
-#if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-                csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.TopDirectoryOnly));
+				List<string> csvFiles = new List<string>(Directory.GetFiles(Program.ContentDir, "*.csv", SearchOption.AllDirectories));
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+                csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.AllDirectories));
 #endif
                 var count = csvFiles.Count;
                 for(var i=0; i<count; ++i)
@@ -219,7 +219,6 @@ namespace MinorShift.Emuera.Content
 					ParserMediator.Warn("指定されたファイルの読み込みに失敗しました:" + arg2, sp, 1);
 					return null;
 				}
-                bmp.name = name;
 				if (bmp.Width > AbstractImage.MAX_IMAGESIZE || bmp.Height > AbstractImage.MAX_IMAGESIZE)
 				{
 					//1824-2 すでに8192以上の幅を持つ画像を利用したバリアントが存在してしまっていたため、警告しつつ許容するように変更
@@ -255,7 +254,6 @@ namespace MinorShift.Emuera.Content
 				if (sccs)
 				{
 					rect = new Rectangle(rectValue[0], rectValue[1], rectValue[2], rectValue[3]);
-                    pos = new Point(rectValue[0], rectValue[1]);
 
                     if (rect.Width <= 0 || rect.Height <= 0)
 					{

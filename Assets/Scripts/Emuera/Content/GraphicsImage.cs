@@ -6,29 +6,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using SkiaSharp;
 using UnityEngine;
 using uEmuera.Drawing;
+using XEmuera.Drawing;
+
 //using System.Threading.Tasks;
 
 namespace MinorShift.Emuera.Content
 {
-	internal sealed class GraphicsImage : AbstractImage
-	{
-		//public Bitmap Bitmap;
-		//public IntPtr GDIhDC { get; protected set; }
-		//protected Graphics g;
-		//protected IntPtr hBitmap;
-		//protected IntPtr hDefaultImg;
+    internal sealed class GraphicsImage : AbstractImage
+    {
+        //public Bitmap Bitmap;
+        //public IntPtr GDIhDC { get; protected set; }
+        //protected Graphics g;
+        //protected IntPtr hBitmap;
+        //protected IntPtr hDefaultImg;
 
-		public GraphicsImage(int id)
-		{
-			ID = id;
-			//g = null;
-			//Bitmap = null;
-			//created = false;
-			//locked = false;
-		}
-		public readonly int ID;
+        public SKBitmap SKBitmap { get; private set; }
+
+        public SKCanvas SKCanvas { get; private set; }
+
+        public bool HasChange = true;
+
+        public GraphicsImage(int id)
+        {
+            ID = id;
+            //g = null;
+            //Bitmap = null;
+            //created = false;
+            //locked = false;
+        }
+
+        public readonly int ID;
         //Size size;
         //Brush brush = null;
         //Pen pen = null;
@@ -67,6 +77,11 @@ namespace MinorShift.Emuera.Content
             is_created = true;
             width = x;
             height = y;
+
+            SKBitmap = new SKBitmap(x, y);
+            SKCanvas = new SKCanvas(SKBitmap);
+
+            HasChange = true;
         }
 
         internal void GCreateFromF(Bitmap bmp, bool useGDI)
@@ -84,6 +99,10 @@ namespace MinorShift.Emuera.Content
             width = bmp.Width;
             height = bmp.Height;
 
+            SKBitmap = SKBitmap.Decode(bmp.path);
+            SKCanvas = new SKCanvas(SKBitmap);
+
+            HasChange = true;
         }
 
         /// <summary>
@@ -92,9 +111,9 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public void GClear(uEmuera.Drawing.Color c)
         {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	g.Clear(c);
+            //	if (g == null)
+            //		throw new NullReferenceException();
+            //	g.Clear(c);
         }
 
         /// <summary>
@@ -165,44 +184,93 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public void GFillRectangle(Rectangle rect)
         {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	if (brush != null)
-        //	{
-        //		g.FillRectangle(brush, rect);
-        //	}
-        //	else
-        //	{
-        //		using (SolidBrush b = new SolidBrush(Config.BackColor))
-        //			g.FillRectangle(b, rect);
-        //	}
+            //	if (g == null)
+            //		throw new NullReferenceException();
+            //	if (brush != null)
+            //	{
+            //		g.FillRectangle(brush, rect);
+            //	}
+            //	else
+            //	{
+            //		using (SolidBrush b = new SolidBrush(Config.BackColor))
+            //			g.FillRectangle(b, rect);
+            //	}
         }
 
-		/// <summary>
-		/// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight)
-		/// エラーチェックは呼び出し元でのみ行う
-		/// </summary>
-		public void GDrawCImg(ASprite img, Rectangle destRect)
-		{
-			//if (g == null)
-			//	throw new NullReferenceException();
-			//img.GraphicsDraw(g, destRect);
-		}
+        /// <summary>
+        /// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight)
+        /// エラーチェックは呼び出し元でのみ行う
+        /// </summary>
+        public void GDrawCImg(ASprite img, Rectangle destRect)
+        {
+            //if (g == null)
+            //	throw new NullReferenceException();
+            //img.GraphicsDraw(g, destRect);
 
-		/// <summary>
-		/// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight, float[][] cm)
-		/// エラーチェックは呼び出し元でのみ行う
-		/// </summary>
-		public void GDrawCImg(ASprite img, Rectangle destRect, float[][] cm)
-		{
-			//if (g == null)
-			//	throw new NullReferenceException();
-			//ImageAttributes imageAttributes = new ImageAttributes();
-			//ColorMatrix colorMatrix = new ColorMatrix(cm);
-			//imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+            if (img is not ASpriteSingle spriteSingle)
+                return;
 
-			//img.GraphicsDraw(g, destRect, imageAttributes);
-		}
+            var destBasePosition = spriteSingle.DestBasePosition;
+            var srcRectangle = spriteSingle.SrcRectangle;
+
+            if (!destBasePosition.IsEmpty)
+            {
+                destRect.X = destRect.X + destBasePosition.X * destRect.Width / srcRectangle.Width;
+                destRect.Y = destRect.Y + destBasePosition.Y * destRect.Height / srcRectangle.Height;
+            }
+
+            using var bitmap = SKBitmap.Decode(img.Bitmap.path);
+
+            DrawBitmapUtils.DrawBitmap(SKCanvas, bitmap, srcRectangle, destRect);
+
+            HasChange = true;
+        }
+
+        /// <summary>
+        /// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight, float[][] cm)
+        /// エラーチェックは呼び出し元でのみ行う
+        /// </summary>
+        public void GDrawCImg(ASprite img, Rectangle destRect, float[][] cm)
+        {
+            //if (g == null)
+            //	throw new NullReferenceException();
+            //ImageAttributes imageAttributes = new ImageAttributes();
+            //ColorMatrix colorMatrix = new ColorMatrix(cm);
+            //imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+            //img.GraphicsDraw(g, destRect, imageAttributes);
+
+            if (img is not ASpriteSingle spriteSingle)
+                return;
+
+            var destBasePosition = spriteSingle.DestBasePosition;
+            var srcRectangle = spriteSingle.SrcRectangle;
+
+            if (!destBasePosition.IsEmpty)
+            {
+                destRect.X = destRect.X + destBasePosition.X * destRect.Width / srcRectangle.Width;
+                destRect.Y = destRect.Y + destBasePosition.Y * destRect.Height / srcRectangle.Height;
+            }
+
+            using var paint = new SKPaint();
+
+            var colorMatrix = new[]
+            {
+                cm[0][0], cm[1][0], cm[2][0], cm[3][0], cm[4][0],
+                cm[0][1], cm[1][1], cm[2][1], cm[3][1], cm[4][1],
+                cm[0][2], cm[1][2], cm[2][2], cm[3][2], cm[4][2],
+                cm[0][3], cm[1][3], cm[2][3], cm[3][3], cm[4][3]
+            };
+
+            paint.ColorFilter = SKColorFilter.CreateColorMatrix(colorMatrix);
+
+            using var bitmap = SKBitmap.Decode(img.Bitmap.path);
+
+            DrawBitmapUtils.DrawBitmap(SKCanvas, bitmap, srcRectangle, destRect,
+                paint);
+
+            HasChange = true;
+        }
 
         /// <summary>
         /// GDRAWG(int ID, int srcID, int destX, int destY, int destWidth, int destHeight, int srcX, int srcY, int srcWidth, int srcHeight)
@@ -210,10 +278,10 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect)
         {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Bitmap src = srcGra.GetBitmap();
-        //	g.DrawImage(src, destRect, srcRect, GraphicsUnit.Pixel);
+            //	if (g == null)
+            //		throw new NullReferenceException();
+            //	Bitmap src = srcGra.GetBitmap();
+            //	g.DrawImage(src, destRect, srcRect, GraphicsUnit.Pixel);
         }
 
 
@@ -223,15 +291,14 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect, float[][] cm)
         {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Bitmap src = srcGra.GetBitmap();
-        //	ImageAttributes imageAttributes = new ImageAttributes();
-        //	ColorMatrix colorMatrix = new ColorMatrix(cm);
-        //	imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default,ColorAdjustType.Bitmap);
-        //	//g.DrawImage(img.Bitmap, destRect, srcRect, GraphicsUnit.Pixel, imageAttributes);なんでこのパターンないのさ
-        //	g.DrawImage(src, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, imageAttributes);
-
+            //	if (g == null)
+            //		throw new NullReferenceException();
+            //	Bitmap src = srcGra.GetBitmap();
+            //	ImageAttributes imageAttributes = new ImageAttributes();
+            //	ColorMatrix colorMatrix = new ColorMatrix(cm);
+            //	imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default,ColorAdjustType.Bitmap);
+            //	//g.DrawImage(img.Bitmap, destRect, srcRect, GraphicsUnit.Pixel, imageAttributes);なんでこのパターンないのさ
+            //	g.DrawImage(src, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, imageAttributes);
         }
 
 
@@ -241,80 +308,82 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public void GDrawGWithMask(GraphicsImage srcGra, GraphicsImage maskGra, Point destPoint)
         {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Bitmap destImg = this.GetBitmap();
-        //	byte[] srcBytes = BytesFromBitmap(srcGra.GetBitmap());
-        //	byte[] srcMaskBytes = BytesFromBitmap(maskGra.GetBitmap());
-        //	Rectangle destRect = new Rectangle(destPoint.X, destPoint.Y, srcGra.Width, srcGra.Height);
+            //	if (g == null)
+            //		throw new NullReferenceException();
+            //	Bitmap destImg = this.GetBitmap();
+            //	byte[] srcBytes = BytesFromBitmap(srcGra.GetBitmap());
+            //	byte[] srcMaskBytes = BytesFromBitmap(maskGra.GetBitmap());
+            //	Rectangle destRect = new Rectangle(destPoint.X, destPoint.Y, srcGra.Width, srcGra.Height);
 
-        //	System.Drawing.Imaging.BitmapData bmpData =
-        //		destImg.LockBits(new Rectangle(0,0, destImg.Width,destImg.Height),
-        //		System.Drawing.Imaging.ImageLockMode.ReadWrite,
-        //		PixelFormat.Format32bppArgb);
-        //	try
-        //	{
-        //		IntPtr ptr = bmpData.Scan0;
-        //		byte[] pixels = new byte[bmpData.Stride * destImg.Height];
-        //		System.Runtime.InteropServices.Marshal.Copy(ptr, pixels, 0, pixels.Length);
+            //	System.Drawing.Imaging.BitmapData bmpData =
+            //		destImg.LockBits(new Rectangle(0,0, destImg.Width,destImg.Height),
+            //		System.Drawing.Imaging.ImageLockMode.ReadWrite,
+            //		PixelFormat.Format32bppArgb);
+            //	try
+            //	{
+            //		IntPtr ptr = bmpData.Scan0;
+            //		byte[] pixels = new byte[bmpData.Stride * destImg.Height];
+            //		System.Runtime.InteropServices.Marshal.Copy(ptr, pixels, 0, pixels.Length);
 
 
-        //		for (int y = 0; y < srcGra.Height; y++)
-        //		{
+            //		for (int y = 0; y < srcGra.Height; y++)
+            //		{
 
-        //			int destIndex = ((destPoint.Y + y) * destImg.Width + destPoint.X) * 4;
-        //			int srcIndex = ((0 + y) * srcGra.Width + 0) * 4;
-        //			for (int x = 0; x < srcGra.Width; x++)
-        //			{
-        //				if (srcMaskBytes[srcIndex] == 255)//完全不透明
-        //				{
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //				}
-        //				else if (srcMaskBytes[srcIndex] == 0)//完全透明
-        //				{
-        //					destIndex += 4;
-        //					srcIndex += 4;
-        //				}
-        //				else//半透明 alpha/255ではなく（alpha+1）/256で計算しているがたぶん誤差
-        //				{
-        //					int mask = srcMaskBytes[srcIndex]; mask++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //				}
-        //			}
-        //		}
+            //			int destIndex = ((destPoint.Y + y) * destImg.Width + destPoint.X) * 4;
+            //			int srcIndex = ((0 + y) * srcGra.Width + 0) * 4;
+            //			for (int x = 0; x < srcGra.Width; x++)
+            //			{
+            //				if (srcMaskBytes[srcIndex] == 255)//完全不透明
+            //				{
+            //					pixels[destIndex++] = srcBytes[srcIndex++];
+            //					pixels[destIndex++] = srcBytes[srcIndex++];
+            //					pixels[destIndex++] = srcBytes[srcIndex++];
+            //					pixels[destIndex++] = srcBytes[srcIndex++];
+            //				}
+            //				else if (srcMaskBytes[srcIndex] == 0)//完全透明
+            //				{
+            //					destIndex += 4;
+            //					srcIndex += 4;
+            //				}
+            //				else//半透明 alpha/255ではなく（alpha+1）/256で計算しているがたぶん誤差
+            //				{
+            //					int mask = srcMaskBytes[srcIndex]; mask++;
+            //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
+            //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
+            //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
+            //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
+            //				}
+            //			}
+            //		}
 
-        //		// Bitmapへコピー
-        //		System.Runtime.InteropServices.Marshal.Copy(pixels, 0, ptr, pixels.Length);
-        //	}
-        //	finally
-        //	{
-        //		destImg.UnlockBits(bmpData);
-        //	}
+            //		// Bitmapへコピー
+            //		System.Runtime.InteropServices.Marshal.Copy(pixels, 0, ptr, pixels.Length);
+            //	}
+            //	finally
+            //	{
+            //		destImg.UnlockBits(bmpData);
+            //	}
         }
 
         public void GSetFont(uEmuera.Drawing.Font r)
         {
-        //	if (font != null)
-        //		font.Dispose();
-        //	font = r;
+            //	if (font != null)
+            //		font.Dispose();
+            //	font = r;
         }
+
         public void GSetBrush(Brush r)
         {
-        //	if (brush != null)
-        //		brush.Dispose();
-        //	brush = r;
+            //	if (brush != null)
+            //		brush.Dispose();
+            //	brush = r;
         }
+
         public void GSetPen(Pen r)
         {
-        //	if (pen != null)
-        //		pen.Dispose();
-        //	pen = r;
+            //	if (pen != null)
+            //		pen.Dispose();
+            //	pen = r;
         }
         //private static byte[] BytesFromBitmap(Bitmap bmp)
         //{
@@ -410,8 +479,11 @@ namespace MinorShift.Emuera.Content
         //	Bitmap.UnlockBits(bmpData);
         //	return true;
         //}
+
         #endregion
+
         #region Bitmap読み込み・削除
+
         /// <summary>
         /// 未作成ならエラー
         /// </summary>
@@ -428,8 +500,8 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public void GSetColor(uEmuera.Drawing.Color c, int x, int y)
         {
-        	if (Bitmap == null)
-        		throw new NullReferenceException();
+            if (Bitmap == null)
+                throw new NullReferenceException();
             //	//UnlockGraphics();
             //	Bitmap.SetPixel(x, y, c);
         }
@@ -440,10 +512,10 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         public uEmuera.Drawing.Color GGetColor(int x, int y)
         {
-        	if (Bitmap == null)
-        		throw new NullReferenceException();
-        	//UnlockGraphics();
-        	return Bitmap.GetPixel(x, y);
+            if (Bitmap == null)
+                throw new NullReferenceException();
+            //UnlockGraphics();
+            return Bitmap.GetPixel(x, y);
         }
 
 
@@ -481,6 +553,10 @@ namespace MinorShift.Emuera.Content
             is_created = false;
             width = 0;
             height = 0;
+
+            SKBitmap?.Dispose();
+            SKCanvas?.Dispose();
+            HasChange = true;
         }
 
         public override void Dispose()
@@ -497,23 +573,37 @@ namespace MinorShift.Emuera.Content
         {
             Dispose();
         }
+
         #endregion
 
 //#region 状態判定（Bitmap読み書きを伴わない）
         //public override bool IsCreated { get { return g != null; } }
-        public override bool IsCreated { get { return is_created; } }
+        public override bool IsCreated
+        {
+            get { return is_created; }
+        }
+
         bool is_created = false;
 
         /// <summary>
         /// int GWIDTH(int ID)
         /// </summary>
-        public int Width { get { return width; } }
+        public int Width
+        {
+            get { return width; }
+        }
+
         int width = 0;
-		/// <summary>
-		/// int GHEIGHT(int ID)
-		/// </summary>
-		public int Height { get { return height; } }
+
+        /// <summary>
+        /// int GHEIGHT(int ID)
+        /// </summary>
+        public int Height
+        {
+            get { return height; }
+        }
+
         int height = 0;
         //#endregion
-	}
+    }
 }

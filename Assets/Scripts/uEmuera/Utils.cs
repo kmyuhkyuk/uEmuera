@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace uEmuera
 {
@@ -203,47 +204,41 @@ namespace uEmuera
             }
             return result;
         }
-        public static Dictionary<string, string> GetContentFiles()
+        public static List<string> GetContentFiles()
         {
-            if(content_files != null)
+            if(content_files.Count > 0)
                 return content_files;
-            content_files = new Dictionary<string, string>();
 
             var contentdir = MinorShift._Library.Sys.ExeDir + "resources/";
             if(!Directory.Exists(contentdir))
                 return content_files;
 
-            List<string> bmpfilelist = new List<string>();
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.png", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.bmp", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.jpg", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.gif", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.webp", SearchOption.TopDirectoryOnly));
-#if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.PNG", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.BMP", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.JPG", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.GIF", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.WEBP", SearchOption.TopDirectoryOnly));
-
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.png", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.bmp", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.jpg", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.gif", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.webp", SearchOption.AllDirectories));
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.PNG", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.BMP", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.JPG", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.GIF", SearchOption.AllDirectories));
+            content_files.AddRange(Directory.GetFiles(contentdir, "*.WEBP", SearchOption.AllDirectories));
 #endif
-            var filecount = bmpfilelist.Count;
-            for(int i=0; i<filecount; ++i)
-            {
-                var filename = bmpfilelist[i];
-                string name = Path.GetFileName(filename).ToUpper();
-                content_files.Add(name, filename);
-            }
+
             return content_files;
         }
         public static string[] GetResourceCSVLines(
             string csvpath, System.Text.Encoding encoding)
         {
             string[] lines = null;
-            if(resource_csv_lines_ != null &&
-                resource_csv_lines_.TryGetValue(csvpath, out lines))
+            if(resource_csv_lines_.TryGetValue(csvpath, out lines))
                 return lines;
             lines = File.ReadAllLines(csvpath, encoding);
+
+            for (int i = 0; i < lines.Length; ++i)
+                lines[i] = lines[i].Replace('\\', '/');
+
             return lines;
         }
         public static void ResourcePrepare()
@@ -254,28 +249,36 @@ namespace uEmuera
 
             var contentdir = MinorShift._Library.Sys.ExeDir + "resources/";
             List<string> csvFiles = new List<string>(Directory.GetFiles(
-                contentdir, "*.csv", SearchOption.TopDirectoryOnly));
-#if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+                contentdir, "*.csv", SearchOption.AllDirectories));
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
             csvFiles.AddRange(Directory.GetFiles(
-                contentdir, "*.CSV", SearchOption.TopDirectoryOnly));
+                contentdir, "*.CSV", SearchOption.AllDirectories));
 #endif
-            resource_csv_lines_ = new Dictionary<string, string[]>();
 
             var encoder = MinorShift.Emuera.Config.Encode;
             var filecount = csvFiles.Count;
             for(int index=0; index < filecount; ++index)
             {
                 var filename = csvFiles[index];
+                var fileParent = Path.GetDirectoryName(filename) + "/";
                 //SpriteManager.ClearResourceCSVLines(filename);
                 string[] lines = SpriteManager.GetResourceCSVLines(filename);
                 if(lines != null)
                 {
+
+                    for (int i = 0; i < lines.Length; ++i)
+                        lines[i] = lines[i].Replace('\\', '/');
+
                     resource_csv_lines_.Add(filename, lines);
                     continue;
                 }
 
                 List<string> newlines = new List<string>();
                 lines = File.ReadAllLines(filename, encoder);
+
+                for (int i = 0; i < lines.Length; ++i)
+                    lines[i] = lines[i].Replace('\\', '/');
+
                 int fixcount = 0;
                 for(int i = 0; i < lines.Length; ++i)
                 {
@@ -287,7 +290,10 @@ namespace uEmuera
                         continue;
 
                     string[] tokens = str.Split(',');
-                    if(tokens.Length >= 6)
+                    if (tokens.Length < 2)
+                        continue;
+
+                    if (tokens.Length >= 6)
                     {
                         try
                         {
@@ -305,20 +311,15 @@ namespace uEmuera
                                 }
                             }
                         }
-                        catch (Exception e)
-                        {}
+                        catch { }
                     }
-                    if (tokens.Length <= 1)
-                        continue;
-                    string name = tokens[1].ToUpper();
-                    string imagepath = null;
-                    content_files.TryGetValue(name, out imagepath);
-                    if(imagepath == null)
-                        continue;
 
-                    var ti = SpriteManager.GetTextureInfo(name, imagepath);
+                    string imagepath = fileParent + tokens[1].ToUpper();
+
+                    var ti = SpriteManager.GetTextureInfo(imagepath);
                     if(ti == null)
                         continue;
+
                     line = string.Format("{0},{1},0,0,{2},{3}",
                         tokens[0], tokens[1], ti.width, ti.height);
                     newlines.Add(line);
@@ -338,12 +339,11 @@ namespace uEmuera
 
             var contentdir = MinorShift._Library.Sys.ExeDir + "resources/";
             List<string> csvFiles = new List<string>(Directory.GetFiles(
-                contentdir, "*.csv", SearchOption.TopDirectoryOnly));
-#if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+                contentdir, "*.csv", SearchOption.AllDirectories));
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
             csvFiles.AddRange(Directory.GetFiles(
-                contentdir, "*.CSV", SearchOption.TopDirectoryOnly));
+                contentdir, "*.CSV", SearchOption.AllDirectories));
 #endif
-            resource_csv_lines_ = new Dictionary<string, string[]>();
 
             var encoder = MinorShift.Emuera.Config.Encode;
             var filecount = csvFiles.Count;
@@ -358,18 +358,38 @@ namespace uEmuera
         }
         public static void ResourceClear()
         {
-            if(content_files != null)
-            {
-                content_files.Clear();
-                content_files = null;
-            }
-            if(resource_csv_lines_ != null)
-            {
-                resource_csv_lines_.Clear();
-                resource_csv_lines_ = null;
-            }
+            content_files.Clear();
+            resource_csv_lines_.Clear();
         }
-        static Dictionary<string, string> content_files = null;
-        static Dictionary<string, string[]> resource_csv_lines_ = null;
-    }
+        static List<string> content_files = new List<string>();
+        static Dictionary<string, string[]> resource_csv_lines_ = new Dictionary<string, string[]>();
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        public static int GetAndroidSDKVersion()
+        {
+            AndroidJavaClass javaClass = new AndroidJavaClass("android.os.Build$VERSION");
+            return javaClass.GetStatic<int>("SDK_INT");
+        }
+
+        public static bool HasAndroidAllFilesAccess()
+        {
+            AndroidJavaClass javaClass = new AndroidJavaClass("android.os.Environment");
+            return javaClass.CallStatic<bool>("isExternalStorageManager");
+	    }
+
+        public static void RequestAndroidAllFilesAccess()
+        {
+            if (GetAndroidSDKVersion() < 30 || HasAndroidAllFilesAccess())
+                return;
+            AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject activity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
+            AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
+            AndroidJavaObject uri = uriClass.CallStatic<AndroidJavaObject>("parse", "package:com.xerysherry.uEmuera");
+            AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent", "android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION");
+            intent.Call<AndroidJavaObject>("setData", uri);
+            activity.Call("startActivity", intent);
+	    }
+#endif
+
+	}
 }
