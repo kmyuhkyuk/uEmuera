@@ -3,7 +3,7 @@ uEmuera
 
 <img src="Assets/splash/icon.png" width="256"/>
 
-此分支修改自 [Fegelein21/uEmuera](https://github.com/Fegelein21/uEmuera) 分支，并同步 [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera) 主分支最新提交
+此分支修改自 [Fegelein21/uEmuera](https://github.com/Fegelein21/uEmuera) 分支，并同步 [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera) 主分支的最新提交
 
 修复了新版本游戏在uEmuera模拟器中无法显示立绘及图片的问题
 
@@ -28,6 +28,7 @@ Emuera是Emulator of Eramaker的缩写，是Windows平台下文字游戏平台�
 源项目地址
 ----
 [https://github.com/xerysherry/uEmuera](https://github.com/xerysherry/uEmuera)
+
 [https://github.com/Fegelein21/uEmuera](https://github.com/Fegelein21/uEmuera)
 
 如何使用：
