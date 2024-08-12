@@ -207,7 +207,7 @@ namespace MinorShift.Emuera.Content
             //	throw new NullReferenceException();
             //img.GraphicsDraw(g, destRect);
 
-            if (img is not ASpriteSingle spriteSingle)
+            if (img is not ASpriteSingle spriteSingle || spriteSingle.Bitmap == null)
                 return;
 
             var destBasePosition = spriteSingle.DestBasePosition;
@@ -219,7 +219,7 @@ namespace MinorShift.Emuera.Content
                 destRect.Y = destRect.Y + destBasePosition.Y * destRect.Height / srcRectangle.Height;
             }
 
-            using var bitmap = SKBitmap.Decode(img.Bitmap.path);
+            using var bitmap = SKBitmap.Decode(spriteSingle.Bitmap.path);
 
             DrawBitmapUtils.DrawBitmap(SKCanvas, bitmap, srcRectangle, destRect);
 
@@ -240,7 +240,7 @@ namespace MinorShift.Emuera.Content
 
             //img.GraphicsDraw(g, destRect, imageAttributes);
 
-            if (img is not ASpriteSingle spriteSingle)
+            if (img is not ASpriteSingle spriteSingle || spriteSingle.Bitmap == null)
                 return;
 
             var destBasePosition = spriteSingle.DestBasePosition;
@@ -264,7 +264,7 @@ namespace MinorShift.Emuera.Content
 
             paint.ColorFilter = SKColorFilter.CreateColorMatrix(colorMatrix);
 
-            using var bitmap = SKBitmap.Decode(img.Bitmap.path);
+            using var bitmap = SKBitmap.Decode(spriteSingle.Bitmap.path);
 
             DrawBitmapUtils.DrawBitmap(SKCanvas, bitmap, srcRectangle, destRect,
                 paint);
