@@ -5,6 +5,8 @@ using MinorShift._Library;
 
 public class EmueraMain : MonoBehaviour
 {
+    [SerializeField] private Transform _content;
+    
     public void Run()
     {
         EmueraThread.instance.Start(debug, use_coroutine);
@@ -84,6 +86,10 @@ public class EmueraMain : MonoBehaviour
         float h = size_delta_.y;
         size_delta_.x = Mathf.Max(w, h);
         size_delta_.y = Mathf.Min(w, h);
+        
+        SetScaleValue(PlayerPrefs.GetFloat("Scale", 1));
+        
+        _content.localScale = new Vector3(PlayerPrefs.GetFloat("ContentScale_X", 1), PlayerPrefs.GetFloat("ContentScale_Y", 1), 1);
     }
 
     public bool restart = false;

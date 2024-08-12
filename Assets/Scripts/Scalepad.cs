@@ -1,18 +1,68 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using MinorShift.Emuera;
 
 public class Scalepad : MonoBehaviour
 {
+    [SerializeField] private InputField _scaleInput;
+
+    [SerializeField] private Button _settingButton;
+
     void Start ()
     {
         GenericUtils.SetListenerOnClick(oneperone_btn, OnOnePerOneClick);
         GenericUtils.SetListenerOnClick(autofit_btn, OnAutoFit);
+
+        var scaleValue = emuera_main.scale_value;
+        
+        text.text = $"{scaleValue}x";
+        slider.value = GetSliderValue(scaleValue);
+        
         slider.onValueChanged.AddListener(OnValueChanged);
-        text.text = "1x";
+        
+        _scaleInput.text = scaleValue.ToString(CultureInfo.InvariantCulture);
+        
+        _scaleInput.onEndEdit.AddListener(value =>
+        {
+            if (!float.TryParse(value, out var floatValue))
+            {
+                floatValue = 0;
+            }
+
+            if (floatValue > 3)
+            {
+                floatValue = 3;
+            }
+            else if (floatValue < 0.5)
+            {
+                floatValue = 0.5f;
+            }
+            
+            emuera_main.SetScaleValue(floatValue);
+        
+            slider.value = GetSliderValue(floatValue);
+
+            _scaleInput.text = floatValue.ToString(CultureInfo.InvariantCulture);
+        });
+        
+        _settingButton.onClick.AddListener(() =>
+        {
+            PlayerPrefs.SetFloat("Scale", emuera_main.scale_value);
+        });
     }
+
+    private static float GetSliderValue(float scaleValue)
+    {
+        if (scaleValue >= 1)
+            return scaleValue - 1;
+        
+        return (scaleValue - 1) * 2;
+    }
+    
     public bool IsShow { get { return gameObject.activeSelf; } }
 
     void OnOnePerOneClick()
@@ -33,6 +83,8 @@ public class Scalepad : MonoBehaviour
             value = (1 + value / 2);
         emuera_main.SetScaleValue(value);
         text.text = string.Format("{0:F1}x", value);
+        
+        _scaleInput.text = value.ToString(CultureInfo.InvariantCulture);
     }
     public void SetColor(Color sprite_color)
     {
