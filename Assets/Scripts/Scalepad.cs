@@ -19,7 +19,7 @@ public class Scalepad : MonoBehaviour
 
         var scaleValue = emuera_main.scale_value;
         
-        text.text = $"{scaleValue}x";
+        text.text = $"{scaleValue:F1}x";
         slider.value = GetSliderValue(scaleValue);
         
         slider.onValueChanged.AddListener(OnValueChanged);
