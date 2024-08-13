@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      64px-Save_font_awesome.svg.png__0: 8567217796875579851
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
