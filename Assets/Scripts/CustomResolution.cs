@@ -27,6 +27,13 @@ public class CustomResolution : MonoBehaviour
                 intValue = 960;
             }
             
+            var resolutionY = PlayerPrefs.GetInt("Resolution_Y", intValue);
+
+            if (intValue < resolutionY)
+            {
+                intValue = resolutionY;
+            }
+            
             PlayerPrefs.SetInt("Resolution_X", intValue);
 
             _xResolutionInput.text = intValue.ToString();
@@ -39,6 +46,13 @@ public class CustomResolution : MonoBehaviour
             if (!int.TryParse(value, out var intValue) || intValue < 540)
             {
                 intValue = 540;
+            }
+
+            var resolutionX = PlayerPrefs.GetInt("Resolution_X", intValue);
+
+            if (intValue > resolutionX)
+            {
+                intValue = resolutionX;
             }
             
             PlayerPrefs.SetInt("Resolution_Y", intValue);
