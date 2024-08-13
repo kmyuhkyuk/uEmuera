@@ -5,19 +5,11 @@ using UnityEngine.UI;
 
 public class OptionWindow : MonoBehaviour
 {
-    [SerializeField] private GameObject _customResolution;
-    
-    [SerializeField] private GameObject _customResolutionIcon;
+    [SerializeField] private ContentScale _contentScale;
 
-    [SerializeField] private GameObject _resolutionBox;
-
-    [SerializeField] private InputField _xResolutionInput;
+    [SerializeField] private GameObject _customResolutionPad;
     
-    [SerializeField] private InputField _yResolutionInput;
-    
-    [SerializeField] private Button _saveResolutionButton;
-    
-    [SerializeField] private Button _closeResolutionButton;
+    [SerializeField] private CustomResolution _customResolution;
     
     // Use this for initialization
     void Start()
@@ -51,49 +43,11 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(resolution_900p, OnResolution900p);
         GenericUtils.SetListenerOnClick(resolution_720p, OnResolution720p);
         GenericUtils.SetListenerOnClick(resolution_540p, OnResolution540p);
-        
-        GenericUtils.SetListenerOnClick(_customResolution, () => _resolutionBox.SetActive(true));
 
-        _xResolutionInput.text = PlayerPrefs.GetInt("ResolutionX", 960).ToString();
+        _customResolution.HideResolutionIcon = HideResolutionIcon;
         
-        _xResolutionInput.onEndEdit.AddListener(value =>
-        {
-            if (!int.TryParse(value, out var intValue) || intValue < 960)
-            {
-                intValue = 960;
-            }
-            
-            PlayerPrefs.SetInt("ResolutionX", intValue);
-
-            _xResolutionInput.text = intValue.ToString();
-        });
+        GenericUtils.SetListenerOnClick(_customResolutionPad, () => _customResolution.gameObject.SetActive(true));
         
-        _yResolutionInput.text = PlayerPrefs.GetInt("ResolutionY", 540).ToString();
-        
-        _yResolutionInput.onEndEdit.AddListener(value =>
-        {
-            if (!int.TryParse(value, out var intValue) || intValue < 540)
-            {
-                intValue = 540;
-            }
-            
-            PlayerPrefs.SetInt("ResolutionY", intValue);
-
-            _yResolutionInput.text = intValue.ToString();
-        });
-        
-        _closeResolutionButton.onClick.AddListener(() => _resolutionBox.SetActive(false));
-        
-        _saveResolutionButton.onClick.AddListener(() =>
-        {
-            ResolutionHelper.resolution_index = 100;
-            ResolutionHelper.Apply();
-            HideResolutionIcon();
-            _customResolutionIcon.SetActive(true);
-            
-            _resolutionBox.SetActive(false);
-        });
-
         GenericUtils.SetListenerOnClick(language_zhcn, OnSelectLanguage);
         GenericUtils.SetListenerOnClick(language_jp, OnSelectLanguage);
         GenericUtils.SetListenerOnClick(language_enus, OnSelectLanguage);
@@ -137,6 +91,8 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(intentbox_close, OnIntentClose);
         GenericUtils.SetListenerOnClick(intentbox_reset, OnIntentReset);
 
+        _contentScale.IntentClose = OnIntentClose;
+
         HideResolutionIcon();
         switch (ResolutionHelper.resolution_index)
         {
@@ -150,7 +106,7 @@ public class OptionWindow : MonoBehaviour
                 resolution_540p_icon.SetActive(true);
                 break;
             case 100:
-                _customResolutionIcon.SetActive(true);
+                _customResolution.SetIconActive(true);
                 break;
             case 1:
             default:
@@ -386,7 +342,7 @@ public class OptionWindow : MonoBehaviour
         resolution_720p_icon.SetActive(false);
         resolution_540p_icon.SetActive(false);
         
-        _customResolutionIcon.SetActive(false);
+        _customResolution.SetIconActive(false);
     }
 
     public void Ready()

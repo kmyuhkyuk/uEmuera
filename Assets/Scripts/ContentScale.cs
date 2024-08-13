@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,11 @@ public class ContentScale : MonoBehaviour
 
     [SerializeField] private InputField _yInput;
 
-    [SerializeField] private Button _reset;
+    [SerializeField] private Button _resetButton;
+
+    [SerializeField] private Button _closeButton;
+
+    public Action IntentClose;
 
     private void Start()
     {
@@ -46,7 +51,9 @@ public class ContentScale : MonoBehaviour
             _yInput.text = floatValue.ToString(CultureInfo.InvariantCulture);
         });
 
-        _reset.onClick.AddListener(() =>
+        _closeButton.onClick.AddListener(() => IntentClose());
+
+        _resetButton.onClick.AddListener(() =>
         {
             PlayerPrefs.SetFloat("ContentScale_X", 1);
 

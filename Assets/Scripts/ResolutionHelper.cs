@@ -40,10 +40,10 @@ public static class ResolutionHelper
         if (resolution_index == 100)
         {
             //保存Aspect
-            _ = _aspect;
+            _ = aspect;
 
-            width = PlayerPrefs.GetInt("ResolutionX", 960);
-            height = PlayerPrefs.GetInt("ResolutionY", 540);
+            width = PlayerPrefs.GetInt("Resolution_X", 960);
+            height = PlayerPrefs.GetInt("Resolution_Y", 540);
         }
         else
         {
