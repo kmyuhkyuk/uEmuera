@@ -34,17 +34,23 @@ public static class ResolutionHelper
 
     static void ApplyResolution()
     {
+        int height;
+        int width;
+        
         if (resolution_index == 100)
         {
+            //保存Aspect
             _ = _aspect;
-            
-            Screen.SetResolution(PlayerPrefs.GetInt("ResolutionX", 960), PlayerPrefs.GetInt("ResolutionY", 540), true, 24);
-            
-            return;
-        }
 
-        var height = resolutions[resolution_index];
-        var width = (int)Mathf.Ceil(height * aspect);
+            width = PlayerPrefs.GetInt("ResolutionX", 960);
+            height = PlayerPrefs.GetInt("ResolutionY", 540);
+        }
+        else
+        {
+            height = resolutions[resolution_index];
+            width = (int)Mathf.Ceil(height * aspect);
+        }
+        
         if(Screen.width > Screen.height)
             Screen.SetResolution(width, height, true, 24);
         else

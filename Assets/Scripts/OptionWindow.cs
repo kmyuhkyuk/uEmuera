@@ -17,6 +17,8 @@ public class OptionWindow : MonoBehaviour
     
     [SerializeField] private Button _saveResolutionButton;
     
+    [SerializeField] private Button _closeResolutionButton;
+    
     // Use this for initialization
     void Start()
     {
@@ -79,6 +81,8 @@ public class OptionWindow : MonoBehaviour
 
             _yResolutionInput.text = intValue.ToString();
         });
+        
+        _closeResolutionButton.onClick.AddListener(() => _resolutionBox.SetActive(false));
         
         _saveResolutionButton.onClick.AddListener(() =>
         {
