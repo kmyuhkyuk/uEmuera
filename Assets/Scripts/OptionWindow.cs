@@ -487,8 +487,8 @@ public class OptionWindow : MonoBehaviour
     {
         int value = PlayerPrefs.GetInt("IntentBox_L", 0);
         value += 1;
-        if (value > 99)
-            value = 99;
+        /*if (value > 99)
+            value = 99;*/
         PlayerPrefs.SetInt("IntentBox_L", value);
         intentbox_L_text.text = value.ToString();
 
@@ -500,8 +500,8 @@ public class OptionWindow : MonoBehaviour
     {
         int value = PlayerPrefs.GetInt("IntentBox_R", 0);
         value += 1;
-        if (value > 99)
-            value = 99;
+        /*if (value > 99)
+            value = 99;*/
         PlayerPrefs.SetInt("IntentBox_R", value);
         intentbox_R_text.text = value.ToString();
 

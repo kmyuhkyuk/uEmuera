@@ -9,8 +9,10 @@ using MinorShift.Emuera;
 public class Scalepad : MonoBehaviour
 {
     [SerializeField] private InputField _scaleInput;
-
-    [SerializeField] private Button _settingButton;
+    
+    [SerializeField] private Button _saveButton;
+    
+    [SerializeField] private Button _reloadButton;
 
     void Start ()
     {
@@ -49,9 +51,20 @@ public class Scalepad : MonoBehaviour
             _scaleInput.text = floatValue.ToString(CultureInfo.InvariantCulture);
         });
         
-        _settingButton.onClick.AddListener(() =>
+        _saveButton.onClick.AddListener(() =>
         {
             PlayerPrefs.SetFloat("Scale", emuera_main.scale_value);
+        });
+        
+        _reloadButton.onClick.AddListener(() =>
+        {
+            var scale = PlayerPrefs.GetFloat("Scale", 1);
+            
+            emuera_main.SetScaleValue(scale);
+
+            slider.value = GetSliderValue(scale);
+            
+            _scaleInput.text = scale.ToString(CultureInfo.InvariantCulture);
         });
     }
 
