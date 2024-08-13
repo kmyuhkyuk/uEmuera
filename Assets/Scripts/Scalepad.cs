@@ -8,11 +8,11 @@ using MinorShift.Emuera;
 
 public class Scalepad : MonoBehaviour
 {
-    [SerializeField] private InputField _scaleInput;
+    [SerializeField] private InputField scaleInput;
     
-    [SerializeField] private Button _saveButton;
+    [SerializeField] private Button saveButton;
     
-    [SerializeField] private Button _reloadButton;
+    [SerializeField] private Button reloadButton;
 
     void Start ()
     {
@@ -26,9 +26,9 @@ public class Scalepad : MonoBehaviour
         
         slider.onValueChanged.AddListener(OnValueChanged);
         
-        _scaleInput.text = scaleValue.ToString(CultureInfo.InvariantCulture);
+        scaleInput.text = scaleValue.ToString(CultureInfo.InvariantCulture);
         
-        _scaleInput.onEndEdit.AddListener(value =>
+        scaleInput.onEndEdit.AddListener(value =>
         {
             if (!float.TryParse(value, out var floatValue))
             {
@@ -48,15 +48,15 @@ public class Scalepad : MonoBehaviour
         
             slider.value = GetSliderValue(floatValue);
 
-            _scaleInput.text = floatValue.ToString(CultureInfo.InvariantCulture);
+            scaleInput.text = floatValue.ToString(CultureInfo.InvariantCulture);
         });
         
-        _saveButton.onClick.AddListener(() =>
+        saveButton.onClick.AddListener(() =>
         {
             PlayerPrefs.SetFloat("Scale", emuera_main.scale_value);
         });
         
-        _reloadButton.onClick.AddListener(() =>
+        reloadButton.onClick.AddListener(() =>
         {
             var scale = PlayerPrefs.GetFloat("Scale", 1);
             
@@ -64,7 +64,7 @@ public class Scalepad : MonoBehaviour
 
             slider.value = GetSliderValue(scale);
             
-            _scaleInput.text = scale.ToString(CultureInfo.InvariantCulture);
+            scaleInput.text = scale.ToString(CultureInfo.InvariantCulture);
         });
     }
 
@@ -97,7 +97,7 @@ public class Scalepad : MonoBehaviour
         emuera_main.SetScaleValue(value);
         text.text = string.Format("{0:F1}x", value);
         
-        _scaleInput.text = value.ToString(CultureInfo.InvariantCulture);
+        scaleInput.text = value.ToString(CultureInfo.InvariantCulture);
     }
     public void SetColor(Color sprite_color)
     {

@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 public class OptionWindow : MonoBehaviour
 {
-    [SerializeField] private ContentScale _contentScale;
+    [SerializeField] private ContentScale contentScale;
 
-    [SerializeField] private GameObject _customResolutionPad;
+    [SerializeField] private GameObject customResolutionPad;
     
-    [SerializeField] private CustomResolution _customResolution;
+    [SerializeField] private CustomResolution customResolution;
     
     // Use this for initialization
     void Start()
@@ -44,9 +44,9 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(resolution_720p, OnResolution720p);
         GenericUtils.SetListenerOnClick(resolution_540p, OnResolution540p);
 
-        _customResolution.HideResolutionIcon = HideResolutionIcon;
+        customResolution.HideResolutionIcon = HideResolutionIcon;
         
-        GenericUtils.SetListenerOnClick(_customResolutionPad, () => _customResolution.gameObject.SetActive(true));
+        GenericUtils.SetListenerOnClick(customResolutionPad, () => customResolution.gameObject.SetActive(true));
         
         GenericUtils.SetListenerOnClick(language_zhcn, OnSelectLanguage);
         GenericUtils.SetListenerOnClick(language_jp, OnSelectLanguage);
@@ -91,7 +91,7 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(intentbox_close, OnIntentClose);
         GenericUtils.SetListenerOnClick(intentbox_reset, OnIntentReset);
 
-        _contentScale.IntentClose = OnIntentClose;
+        contentScale.IntentClose = OnIntentClose;
 
         HideResolutionIcon();
         switch (ResolutionHelper.resolution_index)
@@ -106,7 +106,7 @@ public class OptionWindow : MonoBehaviour
                 resolution_540p_icon.SetActive(true);
                 break;
             case 100:
-                _customResolution.SetIconActive(true);
+                customResolution.SetIconActive(true);
                 break;
             case 1:
             default:
@@ -342,7 +342,7 @@ public class OptionWindow : MonoBehaviour
         resolution_720p_icon.SetActive(false);
         resolution_540p_icon.SetActive(false);
         
-        _customResolution.SetIconActive(false);
+        customResolution.SetIconActive(false);
     }
 
     public void Ready()

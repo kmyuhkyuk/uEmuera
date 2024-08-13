@@ -5,7 +5,7 @@ using MinorShift._Library;
 
 public class EmueraMain : MonoBehaviour
 {
-    [SerializeField] private Transform _content;
+    [SerializeField] private Transform content;
     
     public void Run()
     {
@@ -89,7 +89,7 @@ public class EmueraMain : MonoBehaviour
         
         SetScaleValue(PlayerPrefs.GetFloat("Scale", 1));
         
-        _content.localScale = new Vector3(PlayerPrefs.GetFloat("ContentScale_X", 1), PlayerPrefs.GetFloat("ContentScale_Y", 1), 1);
+        content.localScale = new Vector3(PlayerPrefs.GetFloat("ContentScale_X", 1), PlayerPrefs.GetFloat("ContentScale_Y", 1), 1);
     }
 
     public bool restart = false;

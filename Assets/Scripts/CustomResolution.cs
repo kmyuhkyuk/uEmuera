@@ -4,21 +4,21 @@ using UnityEngine.UI;
 
 public class CustomResolution : MonoBehaviour
 {
-    [SerializeField] private GameObject _customResolutionIcon;
+    [SerializeField] private GameObject customResolutionIcon;
 
-    [SerializeField] private InputField _xResolutionInput;
+    [SerializeField] private InputField xResolutionInput;
 
-    [SerializeField] private InputField _yResolutionInput;
+    [SerializeField] private InputField yResolutionInput;
 
-    [SerializeField] private Button _saveResolutionButton;
+    [SerializeField] private Button saveResolutionButton;
 
-    [SerializeField] private Button _closeResolutionButton;
+    [SerializeField] private Button closeResolutionButton;
 
     public Action HideResolutionIcon;
 
     private void Start()
     {
-        _xResolutionInput.onEndEdit.AddListener(value =>
+        xResolutionInput.onEndEdit.AddListener(value =>
         {
             if (!int.TryParse(value, out var intValue) || intValue < 960)
             {
@@ -32,10 +32,10 @@ public class CustomResolution : MonoBehaviour
                 intValue = resolutionY;
             }
 
-            _xResolutionInput.text = intValue.ToString();
+            xResolutionInput.text = intValue.ToString();
         });
 
-        _yResolutionInput.onEndEdit.AddListener(value =>
+        yResolutionInput.onEndEdit.AddListener(value =>
         {
             if (!int.TryParse(value, out var intValue) || intValue < 540)
             {
@@ -49,20 +49,20 @@ public class CustomResolution : MonoBehaviour
                 intValue = resolutionX;
             }
 
-            _yResolutionInput.text = intValue.ToString();
+            yResolutionInput.text = intValue.ToString();
         });
 
-        _closeResolutionButton.onClick.AddListener(() => gameObject.SetActive(false));
+        closeResolutionButton.onClick.AddListener(() => gameObject.SetActive(false));
 
-        _saveResolutionButton.onClick.AddListener(() =>
+        saveResolutionButton.onClick.AddListener(() =>
         {
-            PlayerPrefs.SetInt("Resolution_X", int.Parse(_xResolutionInput.text));
-            PlayerPrefs.SetInt("Resolution_Y", int.Parse(_yResolutionInput.text));
+            PlayerPrefs.SetInt("Resolution_X", int.Parse(xResolutionInput.text));
+            PlayerPrefs.SetInt("Resolution_Y", int.Parse(yResolutionInput.text));
 
             ResolutionHelper.resolution_index = 100;
             ResolutionHelper.Apply();
             HideResolutionIcon();
-            _customResolutionIcon.SetActive(true);
+            customResolutionIcon.SetActive(true);
 
             gameObject.SetActive(false);
         });
@@ -70,12 +70,12 @@ public class CustomResolution : MonoBehaviour
 
     private void OnEnable()
     {
-        _xResolutionInput.text = PlayerPrefs.GetInt("Resolution_X", 960).ToString();
-        _yResolutionInput.text = PlayerPrefs.GetInt("Resolution_Y", 540).ToString();
+        xResolutionInput.text = PlayerPrefs.GetInt("Resolution_X", 960).ToString();
+        yResolutionInput.text = PlayerPrefs.GetInt("Resolution_Y", 540).ToString();
     }
 
     public void SetIconActive(bool active)
     {
-        _customResolutionIcon.SetActive(active);
+        customResolutionIcon.SetActive(active);
     }
 }
