@@ -34,6 +34,15 @@ public static class ResolutionHelper
 
     static void ApplyResolution()
     {
+        if (resolution_index == 100)
+        {
+            _ = _aspect;
+            
+            Screen.SetResolution(PlayerPrefs.GetInt("ResolutionX", 960), PlayerPrefs.GetInt("ResolutionY", 540), true, 24);
+            
+            return;
+        }
+
         var height = resolutions[resolution_index];
         var width = (int)Mathf.Ceil(height * aspect);
         if(Screen.width > Screen.height)

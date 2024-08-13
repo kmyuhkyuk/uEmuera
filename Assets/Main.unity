@@ -460,7 +460,7 @@ PrefabInstance:
         type: 3}
       propertyPath: option_window
       value: 
-      objectReference: {fileID: 3723794108989082980}
+      objectReference: {fileID: 7526016851007216736}
     - target: {fileID: 114720696547579864, guid: 34d3918ada139ca48a8b646b362de11a,
         type: 3}
       propertyPath: m_Maskable
@@ -582,7 +582,7 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1285289499}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &3308499897084578840
+--- !u!1001 &4299779292682440689
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -709,11 +709,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
---- !u!114 &3723794108989082980 stripped
+--- !u!114 &7526016851007216736 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114304201309413142, guid: 74ea63321f7a1db4ba70952259c180e4,
     type: 3}
-  m_PrefabInstance: {fileID: 3308499897084578840}
+  m_PrefabInstance: {fileID: 4299779292682440689}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -727,7 +727,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 461951792}
   - {fileID: 1088325704}
-  - {fileID: 3308499897084578840}
+  - {fileID: 4299779292682440689}
   - {fileID: 773785030}
   - {fileID: 1285289499}
   - {fileID: 43226830}
