@@ -28,3 +28,12 @@ FirstWindow.Titlebar.title=ゲームリスト
 [Failure]=失敗
 [Exit]=ゲームを終了します
 [ExitContent]=ゲームを終了しますか？
+
+Options.IntentBox.scale_border.titlebar.title=スケール设置
+Options.IntentBox.scale_border.close.Text=閉じる 
+Options.IntentBox.scale_border.reset.Text=リセット
+
+Options.Resolution.Pad.Custom.Text=カスタム
+Options.ResolutionBox.resolution_border.titlebar.title=解像度設定
+Options.ResolutionBox.resolution_border.close.Text=閉じる
+Options.ResolutionBox.resolution_border.save.Text=保存

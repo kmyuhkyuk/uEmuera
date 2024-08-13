@@ -27,3 +27,12 @@ FirstWindow.Titlebar.title=游戏列表
 [Failure]=失败
 [Exit]=退出游戏
 [ExitContent]=是否退出游戏？
+
+Options.IntentBox.scale_border.titlebar.title=大小设置
+Options.IntentBox.scale_border.close.Text=关闭
+Options.IntentBox.scale_border.reset.Text=重置
+
+Options.Resolution.Pad.Custom.Text=自定义
+Options.ResolutionBox.resolution_border.titlebar.title=分辨率设置
+Options.ResolutionBox.resolution_border.close.Text=关闭
+Options.ResolutionBox.resolution_border.save.Text=保存

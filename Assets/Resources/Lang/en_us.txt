@@ -28,3 +28,12 @@ FirstWindow.Titlebar.title=Game List
 [Failure]=Failure
 [Exit]=Exit
 [ExitContent]=Will exit. Are you sure?
+
+Options.IntentBox.scale_border.titlebar.title=Scale Setting
+Options.IntentBox.scale_border.close.Text=Close
+Options.IntentBox.scale_border.reset.Text=Reset
+
+Options.Resolution.Pad.Custom.Text=Custom
+Options.ResolutionBox.resolution_border.titlebar.title=Resolution Setting
+Options.ResolutionBox.resolution_border.close.Text=Close
+Options.ResolutionBox.resolution_border.save.Text=Save
