@@ -10,6 +10,12 @@ public class OptionWindow : MonoBehaviour
     [SerializeField] private GameObject customResolutionPad;
     
     [SerializeField] private CustomResolution customResolution;
+
+    [SerializeField] private GameObject menu_1_TargetFrameRate;
+    
+    [SerializeField] private GameObject menu_2_TargetFrameRate;
+
+    [SerializeField] private CustomTargetFrameRate customTargetFrameRate;
     
     // Use this for initialization
     void Start()
@@ -30,6 +36,8 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(menu_1_language, ShowLanguageBox);
         GenericUtils.SetListenerOnClick(menu_1_github, OnGithub);
         GenericUtils.SetListenerOnClick(menu_1_exit, OnMenuExit);
+        
+        GenericUtils.SetListenerOnClick(menu_1_TargetFrameRate, () => customTargetFrameRate.gameObject.SetActive(true));
 
         GenericUtils.SetListenerOnClick(menu_2_back, OnMenu2Back);
         GenericUtils.SetListenerOnClick(menu_2_restart, OnMenu2Restart);
@@ -37,6 +45,8 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(menu_2_savelog, OnMenuSaveLog);
         GenericUtils.SetListenerOnClick(menu_2_intent, OnIntentBoxShow);
         GenericUtils.SetListenerOnClick(menu_2_exit, OnMenuExit);
+        
+        GenericUtils.SetListenerOnClick(menu_2_TargetFrameRate, () => customTargetFrameRate.gameObject.SetActive(true));
 
         GenericUtils.SetListenerOnClick(resolution_pad, OnResolutionOut);
         GenericUtils.SetListenerOnClick(resolution_1080p, OnResolution1080p);

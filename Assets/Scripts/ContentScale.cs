@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class ContentScale : MonoBehaviour
@@ -51,7 +52,7 @@ public class ContentScale : MonoBehaviour
             yInput.text = floatValue.ToString(CultureInfo.InvariantCulture);
         });
 
-        closeButton.onClick.AddListener(() => IntentClose());
+        closeButton.onClick.AddListener(new UnityAction(IntentClose));
 
         resetButton.onClick.AddListener(() =>
         {

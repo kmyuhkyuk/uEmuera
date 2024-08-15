@@ -37,3 +37,9 @@ Options.Resolution.Pad.Custom.Text=カスタム
 Options.ResolutionBox.resolution_border.titlebar.title=解像度設定
 Options.ResolutionBox.resolution_border.close.Text=閉じる
 Options.ResolutionBox.resolution_border.save.Text=保存
+
+Options.MenuPad.Menu1.targetFrameRate.Text=目標フレームレート
+Options.MenuPad.Menu2.targetFrameRate.Text=目標フレームレート
+Options.TargetFrameRateBox.targetFrameRate_border.titlebar.title=目標フレームレート設定
+Options.TargetFrameRateBox.targetFrameRate_border.close.Text=閉じる
+Options.TargetFrameRateBox.targetFrameRate_border.reset.Text=リセット

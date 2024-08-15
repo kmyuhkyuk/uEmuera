@@ -10,7 +10,7 @@ public class MainEntry : MonoBehaviour
 {
     void Awake()
     {
-        Application.targetFrameRate = 24;
+        Application.targetFrameRate = PlayerPrefs.GetInt("TargetFrameRate", 24);
         ResolutionHelper.Apply();
     }
 

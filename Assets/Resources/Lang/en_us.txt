@@ -37,3 +37,9 @@ Options.Resolution.Pad.Custom.Text=Custom
 Options.ResolutionBox.resolution_border.titlebar.title=Resolution Setting
 Options.ResolutionBox.resolution_border.close.Text=Close
 Options.ResolutionBox.resolution_border.save.Text=Save
+
+Options.MenuPad.Menu1.targetFrameRate.Text=Frame Rate
+Options.MenuPad.Menu2.targetFrameRate.Text=Frame Rate
+Options.TargetFrameRateBox.targetFrameRate_border.titlebar.title=Frame Rate Setting
+Options.TargetFrameRateBox.targetFrameRate_border.close.Text=Close
+Options.TargetFrameRateBox.targetFrameRate_border.reset.Text=Reset

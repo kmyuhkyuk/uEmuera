@@ -36,3 +36,9 @@ Options.Resolution.Pad.Custom.Text=自定义
 Options.ResolutionBox.resolution_border.titlebar.title=分辨率设置
 Options.ResolutionBox.resolution_border.close.Text=关闭
 Options.ResolutionBox.resolution_border.save.Text=保存
+
+Options.MenuPad.Menu1.targetFrameRate.Text=目标帧率
+Options.MenuPad.Menu2.targetFrameRate.Text=目标帧率
+Options.TargetFrameRateBox.targetFrameRate_border.titlebar.title=目标帧率设置
+Options.TargetFrameRateBox.targetFrameRate_border.close.Text=关闭
+Options.TargetFrameRateBox.targetFrameRate_border.reset.Text=重置
