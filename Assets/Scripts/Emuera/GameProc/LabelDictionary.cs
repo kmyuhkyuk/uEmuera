@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 //using System.Windows.Forms;
 using MinorShift.Emuera.Sub;
@@ -21,12 +23,12 @@ namespace MinorShift.Emuera.GameProc
 		/// <summary>
 		/// 本体。全てのFunctionLabelLineを記録
 		/// </summary>
-		Dictionary<string, List<FunctionLabelLine>> labelAtDic = new Dictionary<string, List<FunctionLabelLine>>();
-		List<FunctionLabelLine> invalidList = new List<FunctionLabelLine>();
-		List<GotoLabelLine> labelDollarList = new List<GotoLabelLine>();
+		ConcurrentDictionary<string, List<FunctionLabelLine>> labelAtDic = new ConcurrentDictionary<string, List<FunctionLabelLine>>();
+		ConcurrentBag<FunctionLabelLine> invalidList = new ConcurrentBag<FunctionLabelLine>();
+		ConcurrentBag<GotoLabelLine> labelDollarList = new ConcurrentBag<GotoLabelLine>();
 		int count;
 
-		Dictionary<string, int> loadedFileDic = new Dictionary<string, int>();
+		ConcurrentDictionary<string, int> loadedFileDic = new ConcurrentDictionary<string, int>();
 		int currentFileCount = 0;
 		int totalFileCount = 0;
 
@@ -165,16 +167,10 @@ namespace MinorShift.Emuera.GameProc
 			}
 			foreach (string rKey in removeKey)
 			{
-				labelAtDic.Remove(rKey);
+				labelAtDic.TryRemove(rKey, out _);
 			}
-			for (int i = 0; i < invalidList.Count; i++)
-			{
-				if (string.Equals(invalidList[i].Position.Filename, fname, Config.SCIgnoreCase))
-				{
-					invalidList.RemoveAt(i);
-					i--;
-				}
-			}
+
+			invalidList = new ConcurrentBag<FunctionLabelLine>(invalidList.Where(x => !string.Equals(x.Position.Filename, fname, Config.SCIgnoreCase)));
 		}
 
 
@@ -188,7 +184,7 @@ namespace MinorShift.Emuera.GameProc
             }
             totalFileCount++;
 			currentFileCount = totalFileCount;
-			loadedFileDic.Add(filename, totalFileCount);
+			loadedFileDic.TryAdd(filename, totalFileCount);
 		}
 		public void AddLabel(FunctionLabelLine point)
 		{
@@ -200,7 +196,7 @@ namespace MinorShift.Emuera.GameProc
 			if(!labelAtDic.TryGetValue(id, out function_label_line_list))
 			{
                 function_label_line_list = new List<FunctionLabelLine>();
-				labelAtDic.Add(id, function_label_line_list);
+				labelAtDic.TryAdd(id, function_label_line_list);
 			}
             function_label_line_list.Add(point);
         }
