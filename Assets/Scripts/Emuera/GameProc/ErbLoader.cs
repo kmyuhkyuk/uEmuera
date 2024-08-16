@@ -143,6 +143,11 @@ namespace MinorShift.Emuera.GameProc
             noError = true;
 			labelDic = labelDictionary;
 			labelDic.Initialized = false;
+			
+			var lockObject = new object();
+			var manualReset = new ManualResetEvent(false);
+			var loadCount = 0;
+			
 			foreach (string fpath in path)
 			{
 				if (fpath.StartsWith(Program.ErbDir, Config.SCIgnoreCase) && !Program.AnalysisMode)
@@ -152,8 +157,30 @@ namespace MinorShift.Emuera.GameProc
 				if (Program.AnalysisMode)
 					output.PrintSystemLine(fname + "読み込み中・・・");
 				//System.Windows.Forms.//Application.DoEvents();
-                loadErb(fpath, fname, isOnlyEvent);
+				
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+	                loadErb(fpath, fname, isOnlyEvent);
+						
+	                lock (lockObject)
+	                {
+		                loadCount++;
+		                manualReset.Set();
+	                }
+                });
 			}
+			
+			while (true)
+			{
+				manualReset.WaitOne();
+					
+				lock (lockObject)
+				{
+					if (loadCount == path.Count)
+						break;
+				}
+			}
+			
             if (Program.AnalysisMode)
                 output.NewLine();
             ParserMediator.FlushWarningList();
