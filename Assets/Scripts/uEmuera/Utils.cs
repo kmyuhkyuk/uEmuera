@@ -384,7 +384,7 @@ namespace uEmuera
             AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
-            AndroidJavaObject uri = uriClass.CallStatic<AndroidJavaObject>("parse", "package:com.xerysherry.uEmuera");
+            AndroidJavaObject uri = uriClass.CallStatic<AndroidJavaObject>("parse", "package:com.xerysherry.uEmuera.gkd");
             AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent", "android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION");
             intent.Call<AndroidJavaObject>("setData", uri);
             activity.Call("startActivity", intent);
