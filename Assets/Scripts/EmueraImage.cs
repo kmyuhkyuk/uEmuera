@@ -12,6 +12,8 @@ using SkiaSharp.Unity;
 
 public class EmueraImage : EmueraBehaviour
 {
+    private static readonly Regex ResourceNameRegex = new(@"\d+");
+    
     class ImageInfo : MonoBehaviour
     {
         RectTransform rectTrans = null;
@@ -177,7 +179,7 @@ public class EmueraImage : EmueraBehaviour
             image.name = image_part.Image.Name;
 
             if (image_part.Image is ASpriteSingle spriteSingle &&
-                int.TryParse(Regex.Match(image_part.ResourceName, @"\d+").Value, out var index) && index > 999)
+                int.TryParse(ResourceNameRegex.Match(image_part.ResourceName).Value, out var index) && index > 999)
             {
                 var graphics = AppContents.GetGraphics(index);
 
