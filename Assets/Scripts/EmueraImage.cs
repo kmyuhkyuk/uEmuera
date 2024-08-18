@@ -12,7 +12,11 @@ using SkiaSharp.Unity;
 
 public class EmueraImage : EmueraBehaviour
 {
-    private static readonly Regex ResourceNameRegex = new(@"\d+");
+    private static readonly Regex ResourceIndexRegex = new(@"\d+");
+
+    private static readonly Dictionary<string, int> ResourceIndexDictionary = new();
+    
+    private static readonly Dictionary<int, (Texture2D Texture2D, Sprite Sprite)> ImageDictionary = new();
     
     class ImageInfo : MonoBehaviour
     {
@@ -110,8 +114,6 @@ public class EmueraImage : EmueraBehaviour
     static readonly Color kTransparent = new Color(0, 0, 0, 0);
     GenericUtils.PointerClickListener click_handler_ = null;
 
-    private static readonly Dictionary<int, (Texture2D Texture2D, Sprite Sprite)> imageDictionary = new();
-
     void Awake()
     {
         GenericUtils.SetListenerOnClick(gameObject, OnClick);
@@ -178,58 +180,71 @@ public class EmueraImage : EmueraBehaviour
 
             image.name = image_part.Image.Name;
 
-            if (image_part.Image is ASpriteSingle spriteSingle &&
-                int.TryParse(ResourceNameRegex.Match(image_part.ResourceName).Value, out var index) && index > 999)
+            if (image_part.Image is ASpriteSingle spriteSingle)
             {
-                var graphics = AppContents.GetGraphics(index);
-
-                Texture2D texture;
-                Sprite sprite;
-
-                if (graphics.HasChange)
+                if (!ResourceIndexDictionary.TryGetValue(image_part.ResourceName, out var index))
                 {
-                    var pixelSpan = graphics.SKBitmap.Pixels.AsSpan();
+                    int.TryParse(ResourceIndexRegex.Match(image_part.ResourceName).Value, out index);
+                    
+                    ResourceIndexDictionary.Add(image_part.ResourceName, index);
+                }
 
-                    var bufferWriter = new ArrayBufferWriter<SKColor>();
+                if (index > 999)
+                {
+                    var graphics = AppContents.GetGraphics(index);
 
-                    for (var j = graphics.Height - 1; j >= 0; j--)
+                    Texture2D texture;
+                    Sprite sprite;
+
+                    if (graphics.HasChange)
                     {
-                        bufferWriter.Write(pixelSpan.Slice(j * graphics.Width, graphics.Width));
+                        var pixelSpan = graphics.SKBitmap.Pixels.AsSpan();
+
+                        var bufferWriter = new ArrayBufferWriter<SKColor>();
+
+                        for (var j = graphics.Height - 1; j >= 0; j--)
+                        {
+                            bufferWriter.Write(pixelSpan.Slice(j * graphics.Width, graphics.Width));
+                        }
+
+                        using var nativePixels = bufferWriter.WrittenSpan.ToNativeArray();
+
+                        using var nativePixelData = ColorConverter.ConvertToColor32(nativePixels, width * 64);
+
+                        texture = new Texture2D(graphics.Width, graphics.Height);
+
+                        texture.SetPixelData(nativePixelData, 0);
+
+                        texture.Apply();
+
+                        sprite = Sprite.Create(texture,
+                            GenericUtils.ToUnityRect(spriteSingle.SrcRectangle, texture.width, texture.height),
+                            Vector2.zero);
+
+                        if (ImageDictionary.TryGetValue(index, out var oldImageTuple))
+                        {
+                            Destroy(oldImageTuple.Texture2D);
+                            Destroy(oldImageTuple.Sprite);
+                        }
+
+                        ImageDictionary[index] = (texture, sprite);
+
+                        graphics.HasChange = false;
+                    }
+                    else
+                    {
+                        var imageTuple = ImageDictionary[index];
+
+                        texture = imageTuple.Texture2D;
+                        sprite = imageTuple.Sprite;
                     }
 
-                    using var nativePixels = bufferWriter.WrittenSpan.ToNativeArray();
-
-                    using var nativePixelData = ColorConverter.ConvertToColor32(nativePixels, width * 64);
-
-                    texture = new Texture2D(graphics.Width, graphics.Height);
-
-                    texture.SetPixelData(nativePixelData, 0);
-
-                    texture.Apply();
-
-                    sprite = Sprite.Create(texture,
-                        GenericUtils.ToUnityRect(spriteSingle.SrcRectangle, texture.width, texture.height),
-                        Vector2.zero);
-
-                    if (imageDictionary.TryGetValue(index, out var oldImageTuple))
-                    {
-                        Destroy(oldImageTuple.Texture2D);
-                        Destroy(oldImageTuple.Sprite);
-                    }
-
-                    imageDictionary[index] = (texture, sprite);
-
-                    graphics.HasChange = false;
+                    imageinfo.Load(spriteSingle, texture, sprite);   
                 }
                 else
                 {
-                    var imageTuple = imageDictionary[index];
-
-                    texture = imageTuple.Texture2D;
-                    sprite = imageTuple.Sprite;
+                    imageinfo.Load(image_part.Image);
                 }
-
-                imageinfo.Load(spriteSingle, texture, sprite);
             }
             else
             {
