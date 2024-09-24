@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.ammariqais.skiaforunity": "https://github.com/ammariqais/SkiaForUnity.git?path=SkiaUnity/Assets/SkiaSharp",
-    "com.unity.burst": "1.8.17",
+    "com.unity.burst": "1.8.18",
     "com.unity.ide.rider": "3.0.31",
     "com.unity.ugui": "2.0.0",
     "com.unity.modules.accessibility": "1.0.0",
